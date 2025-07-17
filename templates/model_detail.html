@@ -5,12 +5,31 @@
 {% block content %}
   <div class="row">
     <div class="col-md-8">
-      <h1>{{ model.title }}</h1>
-      <p class="text-muted">by {{ model.user.username }} on {{ model.upload_date.strftime('%Y-%m-%d') }}</p>
+      <div class="d-flex justify-content-between align-items-center">
+        <h1>{{ model.title }}</h1>
+        {% if current_user %}
+            <i class="fas fa-heart favourite-icon {% if model in current_user.favourites | map(attribute='model') %}favourited{% endif %}" data-model-id="{{ model.id }}" style="font-size: 2rem;"></i>
+        {% endif %}
+      </div>
+      <p class="text-muted">by <a href="{{ url_for('user_profile', username=model.user.username) }}">{{ model.user.username }}</a> on {{ model.upload_date.strftime('%Y-%m-%d') }}</p>
       <p>{{ model.description }}</p>
       <p><strong>Tags:</strong> {{ model.tags }}</p>
       <p><strong>Downloads:</strong> {{ model.downloads }}</p>
       <a href="{{ url_for('download', model_id=model.id) }}" class="btn btn-primary">Download</a>
+      {% if current_user %}
+      <div class="mt-3">
+        <form class="d-flex" id="add-to-collection-form" data-model-id="{{ model.id }}">
+            <select class="form-select me-2" name="collection_id">
+                <option selected disabled>Add to collection...</option>
+                {% for collection in current_user.collections %}
+                <option value="{{ collection.id }}">{{ collection.name }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-secondary">Add</button>
+        </form>
+        <div id="collection-message" class="mt-2"></div>
+      </div>
+      {% endif %}
     </div>
     <div class="col-md-4">
       {% if model.image_filename %}
@@ -19,5 +38,36 @@
         <img src="https://placehold.co/600x400?text=No+Image" class="img-fluid" alt="No image">
       {% endif %}
     </div>
+  </div>
+  <hr>
+  <div class="row">
+      <div class="col-md-8">
+          <h3>Comments</h3>
+          {% if current_user %}
+              <form action="{{ url_for('add_comment', model_id=model.id) }}" method="POST" class="mb-3">
+                  <div class="mb-3">
+                      <textarea class="form-control" name="content" rows="3" placeholder="Add a comment..." required></textarea>
+                  </div>
+                  <button type="submit" class="btn btn-primary">Submit</button>
+              </form>
+          {% else %}
+              <p><a href="{{ url_for('login') }}">Log in</a> to post a comment.</p>
+          {% endif %}
+          <hr>
+          {% for comment in model.comments|sort(attribute='timestamp', reverse=True) %}
+              <div class="d-flex mb-3">
+                  <div class="flex-shrink-0">
+                      <img src="{{ url_for('uploaded_file', filename=comment.user.avatar) if comment.user.avatar else 'https://placehold.co/50x50?text=Avatar' }}" class="rounded-circle" alt="{{ comment.user.username }}'s avatar" width="50" height="50">
+                  </div>
+                  <div class="ms-3">
+                      <strong><a href="{{ url_for('user_profile', username=comment.user.username) }}">{{ comment.user.username }}</a></strong>
+                      <small class="text-muted">{{ comment.timestamp.strftime('%Y-%m-%d %H:%M') }}</small>
+                      <p>{{ comment.content }}</p>
+                  </div>
+              </div>
+          {% else %}
+              <p>No comments yet.</p>
+          {% endfor %}
+      </div>
   </div>
 {% endblock %}

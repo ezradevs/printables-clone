@@ -23,8 +23,13 @@
           {% endif %}
           <div class="card-body">
             <h5 class="card-title">{{ model.title }}</h5>
-            <p class="card-text">by {{ model.user.username }}</p>
-            <a href="{{ url_for('model_detail', model_id=model.id) }}" class="btn btn-primary">View Details</a>
+            <p class="card-text">by <a href="{{ url_for('user_profile', username=model.user.username) }}">{{ model.user.username }}</a></p>
+            <div class="d-flex justify-content-between align-items-center">
+              <a href="{{ url_for('model_detail', model_id=model.id) }}" class="btn btn-primary">View Details</a>
+              {% if current_user %}
+                <i class="fas fa-heart favourite-icon {% if model in current_user.favourites | map(attribute='model') %}favourited{% endif %}" data-model-id="{{ model.id }}"></i>
+              {% endif %}
+            </div>
           </div>
         </div>
       </div>
