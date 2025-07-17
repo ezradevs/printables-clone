@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Upload Model{% endblock %}
+
+{% block content %}
+  <h1>Upload Model</h1>
+  <form method="post" enctype="multipart/form-data">
+    <div class="mb-3">
+      <label for="title" class="form-label">Title</label>
+      <input type="text" class="form-control" id="title" name="title" required>
+    </div>
+    <div class="mb-3">
+      <label for="description" class="form-label">Description</label>
+      <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+    </div>
+    <div class="mb-3">
+      <label for="tags" class="form-label">Tags (comma-separated)</label>
+      <input type="text" class="form-control" id="tags" name="tags">
+    </div>
+    <div class="mb-3">
+      <label for="model_file" class="form-label">Model File (STL, 3MF)</label>
+      <input type="file" class="form-control" id="model_file" name="model_file" accept=".stl,.3mf" required>
+    </div>
+    <div class="mb-3">
+      <label for="image_file" class="form-label">Preview Image (optional)</label>
+      <input type="file" class="form-control" id="image_file" name="image_file" accept="image/*">
+    </div>
+    <button type="submit" class="btn btn-primary">Upload</button>
+  </form>
+{% endblock %}
